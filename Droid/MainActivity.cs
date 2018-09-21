@@ -1,55 +1,84 @@
 ﻿using Android.App;
 using Android.Widget;
 using Android.OS;
-using Android.Locations;
-using System.Collections.Generic;
-using System.Linq;
-using Android.Util;
-using Android.Runtime;
 using Plugin.DeviceInfo;
-using Android.Content;
-using Android.Provider;
-using Android.Views;
-using Android.Hardware;
-using System.IO;
 using Plugin.CurrentActivity;
 using System;
+using System.Globalization;
+using System.Threading.Tasks;
+using LocatiomTracker;
+using Plugin.Geolocator.Abstractions;
 using Plugin.Media.Abstractions;
-using Android.Graphics;
 
 namespace LocationTracker.Droid
 {
     [Activity(Label = "LocationTracker", MainLauncher = true, Icon = "@mipmap/icon")]
-    public class MainActivity : Activity, ILocationListener
+    public class MainActivity : Activity
     {
-        Android.Locations.Location currentLocation;
-        LocationManager locationManager;
-        string locationProvider;
-        TextView Latitude;
-        TextView Longitude;
-        TextView DeviceName;
-        TextView DeviceOs;
-        TextView DeviceVersion;
-        TextView DeviceUid;
-        Button OpenCamera;
-        int CameraOpenRequest = 101;
-        protected override void OnCreate(Bundle savedInstanceState)
+        private TextView _latitude;
+        private TextView _longitude;
+        private TextView _deviceName;
+        private TextView _deviceOs;
+        private TextView _deviceVersion;
+        private TextView _deviceUid;
+        private Button _openCamera;
+        private Position _position;
+        private MyLocation _location;
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.Main);
-
             CrossCurrentActivity.Current.Init(this, savedInstanceState);
+            _location = new MyLocation(SetLocation);
+            await _location.StartListening();
 
-            Latitude = FindViewById<TextView>(Resource.Id.LatitudeTextView);
-            Longitude = FindViewById<TextView>(Resource.Id.LongitudeTextView);
-            DeviceName = FindViewById<TextView>(Resource.Id.DeviceNameTextView);
-            DeviceOs = FindViewById<TextView>(Resource.Id.DeviceOSTextView);
-            DeviceVersion = FindViewById<TextView>(Resource.Id.DeviceVersionTextView);
-            DeviceUid = FindViewById<TextView>(Resource.Id.DeviceUidTextView);
-            OpenCamera = FindViewById<Button>(Resource.Id.OpenCameraButton);
+            FindViewById();
 
-            OpenCamera.Click += async(s, e) =>
+            SetEventHandlers();
+            SetDeviceInfo();
+
+            await GetLocation();
+        }
+
+        public async Task GetLocation()
+        {
+            _position = await _location.GetCurrentLocation();
+            SetLocation(_position);
+        }
+
+        private void SetLocation(Position position)
+        {
+            if (position != null)
+            {
+                _latitude.Text = position.Latitude.ToString(CultureInfo.InvariantCulture);
+                _longitude.Text = position.Longitude.ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
+        private void SetDeviceInfo()
+        {
+            var info = CrossDeviceInfo.Current;
+            _deviceName.Text = info.DeviceName;
+            _deviceOs.Text = info.Model;
+            _deviceVersion.Text = info.Platform + " " + info.Version;
+            _deviceUid.Text = info.Manufacturer;
+        }
+
+        private void FindViewById()
+        {
+            _latitude = FindViewById<TextView>(Resource.Id.LatitudeTextView);
+            _longitude = FindViewById<TextView>(Resource.Id.LongitudeTextView);
+            _deviceName = FindViewById<TextView>(Resource.Id.DeviceNameTextView);
+            _deviceOs = FindViewById<TextView>(Resource.Id.DeviceOSTextView);
+            _deviceVersion = FindViewById<TextView>(Resource.Id.DeviceVersionTextView);
+            _deviceUid = FindViewById<TextView>(Resource.Id.DeviceUidTextView);
+            _openCamera = FindViewById<Button>(Resource.Id.OpenCameraButton);
+        }
+
+        private void SetEventHandlers()
+        {
+            _openCamera.Click += async (s, e) =>
             {
                 try
                 {
@@ -76,77 +105,13 @@ namespace LocationTracker.Droid
                 }
 
             };
-
-
-            var info = CrossDeviceInfo.Current;
-            DeviceName.Text = info.DeviceName;
-            DeviceOs.Text = info.Model;
-            DeviceVersion.Text = info.Platform + " " + info.Version;
-            DeviceUid.Text = info.Manufacturer;
-            InitializeLocationManager();
-
         }
 
-        protected override void OnResume()
-        {
-            base.OnResume();
-            locationManager.RequestLocationUpdates(locationProvider, 0, 0, this);
-        }
-        protected override void OnPause()
-        {
-            base.OnPause();
-            locationManager.RemoveUpdates(this);
-        }
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
+        public override void OnRequestPermissionsResult(
+            int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
         {
             Plugin.Permissions.PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-
-        private void InitializeLocationManager()
-        {
-            locationManager = (LocationManager)GetSystemService(LocationService);
-            Criteria criteriaForLocationService = new Criteria
-            {
-                Accuracy = Accuracy.Fine
-            };
-            IList<string> acceptableLocationProviders = locationManager.GetProviders(criteriaForLocationService, true);
-            if (acceptableLocationProviders.Any())
-            {
-                locationProvider = acceptableLocationProviders.First();
-            }
-            else
-            {
-                locationProvider = string.Empty;
-            }
-            //Log.Debug(Tag, "Using " + locationProvider + ".");
-        }
-
-
-        public void OnLocationChanged(Android.Locations.Location location)
-        {
-            currentLocation = location;
-            if (currentLocation == null)
-            {
-                //Error Message  
-            }
-            else
-            {
-                Latitude.Text = currentLocation.Latitude.ToString();
-                Longitude.Text = currentLocation.Longitude.ToString();
-            }
-        }
-
-        public void OnProviderDisabled(string provider)
-        {
-        }
-
-        public void OnProviderEnabled(string provider)
-        {
-        }
-
-        public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras)
-        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
