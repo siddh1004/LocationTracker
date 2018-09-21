@@ -18,13 +18,15 @@ namespace LocationTracker.iOS
             if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
             {
                 locMgr.RequestAlwaysAuthorization(); // works in background
-                                                     //locMgr.RequestWhenInUseAuthorization (); // only in foreground
+                                                     locMgr.RequestWhenInUseAuthorization (); // only in foreground
             }
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
             {
                 locMgr.AllowsBackgroundLocationUpdates = true;
             }
+
+            LocationUpdated += PrintLocation;
         }
 
         public CLLocationManager LocMgr
@@ -45,6 +47,16 @@ namespace LocationTracker.iOS
                 };
                  LocMgr.StartUpdatingLocation();
             }
+        }
+
+        public void PrintLocation(object sender, LocationUpdatedEventArgs e)
+        {
+            CLLocation location = e.Location;
+            Console.WriteLine("Altitude: " + location.Altitude + " meters");
+            Console.WriteLine("Longitude: " + location.Coordinate.Longitude);
+            Console.WriteLine("Latitude: " + location.Coordinate.Latitude);
+            Console.WriteLine("Course: " + location.Course);
+            Console.WriteLine("Speed: " + location.Speed);
         }
     }
 }

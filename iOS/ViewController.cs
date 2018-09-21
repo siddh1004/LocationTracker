@@ -21,8 +21,6 @@ namespace LocationTracker.iOS
         {
             base.ViewDidLoad();
 
-            // It is better to handle this with notifications, so that the UI updates
-            // resume when the application re-enters the foreground!
             Manager.LocationUpdated += HandleLocationChanged;
 
             var info = CrossDeviceInfo.Current;
@@ -53,6 +51,14 @@ namespace LocationTracker.iOS
                 }
 
             };
+
+            UIApplication.Notifications.ObserveDidEnterBackground((sender, args) => {
+                Manager.LocationUpdated -= HandleLocationChanged;
+            });
+
+            UIApplication.Notifications.ObserveDidBecomeActive((sender, args) => {
+                Manager.LocationUpdated += HandleLocationChanged;
+            });
 
         }
 
