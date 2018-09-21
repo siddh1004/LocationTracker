@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical" 
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="24dp"
+              android:background="@android:color/background_light">
+              
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="24dp">
+        
+        <TextView
+    android:text="Latitude :"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginRight="12dp"
+        android:textColor="#101010"/>
+        
+         <TextView
+    android:id="@+id/LatitudeTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="#101010"/>
+        
+    </LinearLayout>
+    
+     <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="36dp"
+        android:textColor="#101010">
+        
+         <TextView
+    android:text="Longitude:"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginRight="12dp"
+        android:textColor="#101010"/>
+                
+                 <TextView
+   android:id="@+id/LongitudeTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="#101010"/>
+        
+    </LinearLayout>
+    
+            
+     <TextView
+   android:text="Device Information :"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:textColor="#101010"> 
+    </TextView>
+    
+     <TextView
+   android:id="@+id/DeviceNameTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="#101010"> 
+    </TextView>
+    
+     <TextView
+   android:id="@+id/DeviceOSTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="#101010"> 
+    </TextView>
+    
+     <TextView
+   android:id="@+id/DeviceVersionTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="#101010"> 
+    </TextView>
+    
+     <TextView
+   android:id="@+id/DeviceUidTextView"
+    android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="36dp"
+        android:textColor="#101010"> 
+    </TextView>
+    
+    <Button
+    android:id="@+id/OpenCameraButton"
+    android:text="Camera"
+    android:background="@android:color/holo_blue_bright"
+    android:textColor="#101010"
+    android:padding="16dp"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+    
+</LinearLayout>
